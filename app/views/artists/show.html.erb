@@ -1,0 +1,75 @@
+<div class="main-container artist-detail">
+  <div class="artist-detail__hero">
+    <div class="artist-detail__main">
+      <div class="artist-detail__title-row">
+        <h1 class="artist-detail__title"><%= @artist.combined_name %></h1>
+        <%= link_to toggle_favorite_artist_path(@artist), remote: true, method: :post, class: "artist-detail__favorite" do %>
+          <% if @artist.favorited? %>
+            <i class="fas fa-heart heart-pink"></i>
+          <% else %>
+            <i class="fas fa-heart heart-black"></i>
+          <% end %>
+        <% end %>
+      </div>
+      <% if @artist.nickname.present? && @artist.nickname_mode? %>
+        <div class="artist-detail__subtitle"><%= @artist.nickname %></div>
+      <% end %>
+      <div class="artist-detail__meta">
+        <% if @artist.genre.present? %>
+          <span>ジャンル: <%= @artist.genre %></span>
+        <% end %>
+        <% if @artist.founding_date.present? %>
+          <span>結成日: <%= @artist.founding_date %> (<%= days_since(@artist.founding_date) %>日目)</span>
+        <% end %>
+        <% if @artist.first_show_date.present? %>
+          <span>初ライブ参加日: <%= @artist.first_show_date %> (<%= days_since(@artist.first_show_date) %>日目)</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="artist-detail__actions">
+      <%= link_to edit_artist_path(@artist), class: "artist-detail__action artist-detail__action--edit" do %>
+        <i class="fas fa-edit"></i> 編集
+      <% end %>
+      <%= link_to artist_path(@artist), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "artist-detail__action artist-detail__action--delete" do %>
+        <i class="fas fa-trash-alt"></i> 削除
+      <% end %>
+    </div>
+  </div>
+  <div class="artist-detail__grid">
+    <section class="artist-card artist-card--members">
+      <h2 class="artist-card__title">メンバー</h2>
+      <% if @artist.members.any? %>
+        <div class="artist-members">
+          <% @artist.members.each do |member| %>
+            <div class="artist-member__item" id="member_<%= member.id %>">
+              <span><%= member.name %></span>
+              <%= link_to artist_member_path(@artist, member), method: :delete, remote: true, data: { confirm: "本当に削除しますか？" }, class: "artist-member__delete" do %>
+                <i class="fas fa-trash-alt"></i>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="artist-card__empty">メンバーは未登録です</div>
+      <% end %>
+    </section>
+    <section class="artist-card artist-card--image">
+      <h2 class="artist-card__title">画像</h2>
+      <% if @artist.image.present? && @artist.image? %>
+        <div class="artist-image__frame">
+          <%= image_tag(@artist.image.url, class: "artist-image__img") %>
+        </div>
+      <% else %>
+        <div class="artist-card__empty">画像がありません</div>
+      <% end %>
+    </section>
+    <section class="artist-card artist-card--memo">
+      <h2 class="artist-card__title">メモ</h2>
+      <% if @artist.memo.present? %>
+        <div class="artist-card__memo"><%= simple_format(@artist.memo) %></div>
+      <% else %>
+        <div class="artist-card__empty">メモは未登録です</div>
+      <% end %>
+    </section>
+  </div>
+</div>

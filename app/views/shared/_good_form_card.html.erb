@@ -1,0 +1,110 @@
+<div class="card live-form__card">
+  <div class="card-body live-form__body">
+    <div class="live-form__title">グッズ記録</div>
+    <%= render "shared/error_messages", resource: good %>
+    <%= form_with model: good, html: { class: "live-form__form" } do |f| %>
+      <% quantity_error = good.errors.full_messages_for(:quantity).first %>
+      <% category_error = (good.errors.full_messages_for(:category) + good.errors.full_messages_for(:category_id)).first %>
+      <div class="live-form__section live-form__section--primary">
+        <div class="live-form__section-title">必須</div>
+        <div class="live-form__grid good-form__grid--primary">
+          <div class="form-group live-form__field">
+            <%= f.label :quantity, "個数" %><span class="text-danger">*</span>
+            <div class="cube-field cube-field--primary <%= 'is-invalid' if quantity_error %>">
+              <div class="cube-field__shell">
+                <%= f.number_field :quantity, class: "form-control #{'is-invalid' if quantity_error}", placeholder: "数字を入力" %>
+              </div>
+            </div>
+          </div>
+          <div class="form-group live-form__field">
+            <%= f.label :category_id, "カテゴリー" %> <span class="text-danger">*</span>
+            <div class="cube-field cube-field--primary <%= 'is-invalid' if category_error %>">
+              <div class="cube-field__shell">
+                <%= f.select :category_id, categories.map { |c| [c.name, c.id] }, { include_blank: true, selected: @selected_category_id }, { class: "form-control #{'is-invalid' if category_error}", id: "category_selector" } %>
+              </div>
+            </div>
+          </div>
+          <div class="form-group live-form__field">
+            <%= f.label :name, "商品名" %>
+            <div class="cube-field cube-field--primary">
+              <div class="cube-field__shell">
+                <%= f.text_field :name, class: "form-control" %>
+              </div>
+            </div>
+          </div>
+          <div class="form-group live-form__field">
+            <%= f.label :price, "価格" %>
+            <div class="cube-field cube-field--primary">
+              <div class="cube-field__shell">
+                <%= f.number_field :price, class: "form-control", placeholder: "数字を入力" %>
+              </div>
+            </div>
+          </div>
+          <%= f.fields_for :category do |cf| %>
+            <div class="form-group live-form__field good-form__new-category" id="new-categories" style="display:none">
+              <%= cf.label :name, "追加するカテゴリー" %>
+              <div class="cube-field cube-field--primary">
+                <div class="cube-field__shell">
+                  <%= text_field_tag "good[new_category_name]", nil, class: "form-control" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <details class="optional-section">
+        <summary class="optional-section__summary">
+          <span class="optional-section__label">追加情報（オプション）</span>
+          <span class="optional-section__summary-text"></span>
+        </summary>
+        <div class="optional-section__body">
+          <div class="live-form__grid">
+            <div class="form-group live-form__field">
+              <%= f.label :live_schedule_id, "ライブ記録" %>
+              <div class="cube-field">
+                <div class="cube-field__shell">
+                  <%= f.select :live_schedule_id, live_schedules.map { |lr| [lr.name, lr.id] }, { include_blank: "-ライブ記録を選択-", selected: good.live_schedule_id }, { class: "form-control" } %>
+                </div>
+              </div>
+            </div>
+            <div class="form-group live-form__field">
+              <div class="good-form__label-row">
+                <%= f.label :artist_id, "アーティスト" %>
+                <%= link_to "追加", new_artist_path(from: request.fullpath), class: "good-form__inline-link" %>
+              </div>
+              <% artist_select_options = { include_blank: "-アーティストを選択-", selected: (params[:selected_artist_id].presence || good.artist_id) } %>
+              <div class="cube-field">
+                <div class="cube-field__shell">
+                  <%= f.select :artist_id, current_user.artists.all.collect { |artist| [artist.display_name, artist.id] }, artist_select_options, class: "form-control" %>
+                </div>
+              </div>
+            </div>
+            <div class="form-group live-form__field">
+              <div class="d-flex align-items-center justify-content-between">
+                <%= f.label :member_id, "メンバー" %>
+                <%= link_to "メンバーを追加", "#", class: "btn btn-secondary btn-sm", id: "add_member_link", style: "display: none;" %>
+              </div>
+              <div class="cube-field">
+                <div class="cube-field__shell">
+                  <%= f.select :member_id, [["-アーティストを選択してください-", ""]], {}, { class: "form-control", disabled: true, data: { selected_member_id: good.member_id } } %>
+                </div>
+              </div>
+            </div>
+            <div class="form-group live-form__field">
+              <%= f.label :date, "購入日" %>
+              <div class="cube-field">
+                <div class="cube-field__shell">
+                  <%= f.text_field :date, class: "form-control datepicker", placeholder: "未設定の場合は作成日" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <div class="form-group">
+        <%= f.submit "作成", class: "live-form__submit" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,55 @@
+<div class="main-container live-index">
+  <div class="live-index__header">
+    <div class="live-index__title"><%= title %></div>
+    <div class="live-index__header-actions">
+      <% if sort_options.present? %>
+        <%= form_with url: sort_path, method: :get, local: true, class: "live-index__sort-form" do %>
+          <%= select_tag :sort, options_for_select(sort_options, sort_value), class: "live-index__sort-select", onchange: "this.form.submit()" %>
+        <% end %>
+      <% end %>
+      <%= link_to cta_label, cta_path, class: "live-index__cta" %>
+    </div>
+  </div>
+  <% if lives.any? %>
+    <div class="live-list">
+      <% lives.each do |live_schedule| %>
+        <a href="<%= live_schedule_path(live_schedule) %>" class="live-list__item">
+          <div class="live-list__date">
+            <span class="live-list__date-main"><%= l(live_schedule.date, format: "%-m/%-d") %></span>
+            <span class="live-list__date-sub"><%= l(live_schedule.date, format: "%a") %></span>
+          </div>
+          <div class="live-list__body">
+            <div class="live-list__title"><%= live_schedule.name %></div>
+            <div class="live-list__sub">
+              <span><%= live_schedule.venue.name %></span>
+              <% if live_schedule.venue.area.present? %>
+                <span class="live-list__muted">（<%= live_schedule.venue.area %>）</span>
+              <% end %>
+              <% if live_schedule.artist.present? %>
+                <span class="live-list__muted">/ <%= live_schedule.artist.display_name %></span>
+              <% end %>
+            </div>
+          </div>
+          <div class="live-list__badges">
+            <% if variant == :planned %>
+              <%= render "shared/planned_live_badges", live_schedule: live_schedule %>
+            <% else %>
+              <% live_fee = [live_schedule.ticket_price, live_schedule.drink_price].compact.sum %>
+              <% if live_fee.positive? %>
+                <span class="live-badge">ライブ代 <%= live_fee %>円</span>
+              <% end %>
+              <% if live_schedule.memo.present? %>
+                <span class="live-badge">メモあり</span>
+              <% end %>
+              <% if live_schedule.timetable.present? || live_schedule.announcement_image.present? %>
+                <span class="live-badge">画像あり</span>
+              <% end %>
+            <% end %>
+          </div>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="live-index__empty"><%= empty_message %></div>
+  <% end %>
+</div>

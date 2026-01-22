@@ -1,0 +1,155 @@
+<div class="main-container live-show-page">
+  <% status = @live_schedule.ticket_status %>
+  <% status_class =
+    case status
+    when "購入済"
+      "live-badge--status-purchased"
+    when "未購入"
+      "live-badge--status-unpurchased"
+    when "当日のみ"
+      "live-badge--status-onsite"
+    when "チケ無し"
+      "live-badge--status-none"
+    else
+      ""
+    end %>
+  <div class="live-show-hero">
+    <div class="live-show-hero__main">
+      <div class="live-show-hero__title"><%= @live_schedule.name %></div>
+      <% if @live_schedule.artist.present? %>
+        <div class="live-show-hero__subtitle"><%= @live_schedule.artist.display_name %></div>
+      <% end %>
+      <div class="live-show-hero__meta">
+        <span><%= l(@live_schedule.date, format: "%-m月%-d日 (%a)") %></span>
+        <span><%= @live_schedule.venue.name %><% if @live_schedule.venue.area.present? %>（<%= @live_schedule.venue.area %>）<% end %></span>
+      </div>
+      <div class="live-show-hero__badges">
+        <% if @live_schedule.attended? %>
+          <span class="live-badge live-badge--record">記録</span>
+        <% else %>
+          <span class="live-badge live-badge--days live-badge--days-primary"><%= @live_schedule.days_until_label %></span>
+        <% end %>
+        <% if status.present? %>
+          <span class="live-badge <%= status_class %>"><%= status.humanize %></span>
+        <% end %>
+      </div>
+    </div>
+    <div class="live-show-hero__actions">
+      <div class="live-show-hero__actions-top">
+        <%= link_to "編集", edit_live_schedule_path(@live_schedule), class: "live-show-hero__action live-show-hero__action--ghost" %>
+        <%= link_to @live_schedule, method: :delete, data: { confirm: "本当に削除しますか？" }, class: "live-show-hero__action live-show-hero__action--danger" do %>
+          <i class="fas fa-trash" aria-hidden="true"></i>
+        <% end %>
+      </div>
+      <% unless @live_schedule.attended? %>
+        <div class="live-show-hero__weather" id="weather-section" data-weather-api-key="<%= ENV["weather_API"] %>" data-latitude="<%= @live_schedule.venue.latitude %>" data-longitude="<%= @live_schedule.venue.longitude %>">
+          <div id="weather-report-area"></div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="live-show-grid">
+      <div class="live-card live-card--primary">
+        <div class="live-card__title">基本情報</div>
+        <div class="live-card__row">
+          <span class="live-card__label">日付</span>
+          <span class="live-card__value" id="live-schedule-date" data-date="<%= @live_schedule.date %>"><%= l(@live_schedule.date, format: "%-m月%-d日 (%a)") %></span>
+        </div>
+        <div class="live-card__row">
+          <span class="live-card__label">会場</span>
+          <span class="live-card__value">
+            <%= @live_schedule.venue.name %>
+            <%= link_to "https://www.google.com/maps/search/#{@live_schedule.venue.name}", target: "_blank", class: "live-card__link", aria: { label: "Googleマップで会場を開く" } do %>
+              <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+            <% end %>
+          </span>
+        </div>
+        <% if @live_schedule.artist.present? %>
+          <div class="live-card__row">
+            <span class="live-card__label">アーティスト</span>
+            <span class="live-card__value"><%= @live_schedule.artist.display_name %></span>
+          </div>
+        <% end %>
+        <% if @live_schedule.open_time.present? %>
+          <div class="live-card__row">
+            <span class="live-card__label">OPEN</span>
+            <span class="live-card__value"><%= @live_schedule.open_time.strftime("%H:%M") %></span>
+          </div>
+        <% end %>
+        <% if @live_schedule.start_time.present? %>
+          <div class="live-card__row">
+            <span class="live-card__label">START</span>
+            <span class="live-card__value"><%= @live_schedule.start_time.strftime("%H:%M") %></span>
+          </div>
+        <% end %>
+        <div id="live-time-info" data-time="<%= @live_schedule.start_time ? @live_schedule.start_time.strftime("%H:%M") : (@live_schedule.open_time ? @live_schedule.open_time.strftime("%H:%M") : "12:00") %>"></div>
+      </div>
+
+      <div class="live-card">
+        <div class="live-card__title">チケット</div>
+        <% if @live_schedule.ticket_status? %>
+          <div class="live-card__row">
+            <span class="live-card__label">購入状況</span>
+            <span class="live-card__value"><%= @live_schedule.ticket_status.humanize %></span>
+          </div>
+        <% end %>
+        <% if @live_schedule.ticket_sale_date? %>
+          <div class="live-card__row">
+            <span class="live-card__label">発売日時</span>
+            <span class="live-card__value"><%= @live_schedule.ticket_sale_date.strftime("%Y-%m-%d %H:%M") %></span>
+          </div>
+        <% end %>
+        <% if @live_schedule.ticket_price? %>
+          <div class="live-card__row">
+            <span class="live-card__label">チケット代</span>
+            <span class="live-card__value"><%= @live_schedule.ticket_price %>円</span>
+          </div>
+        <% end %>
+        <% if @live_schedule.drink_price? %>
+          <div class="live-card__row">
+            <span class="live-card__label">ドリンク代</span>
+            <span class="live-card__value"><%= @live_schedule.drink_price %>円</span>
+          </div>
+        <% end %>
+        <% unless @live_schedule.ticket_status? || @live_schedule.ticket_sale_date? || @live_schedule.ticket_price? || @live_schedule.drink_price? %>
+          <div class="live-card__empty">チケット情報は未設定です</div>
+        <% end %>
+      </div>
+
+      <div class="live-card live-card--muted">
+        <div class="live-card__title">メモ</div>
+        <% if @live_schedule.memo.present? %>
+          <div class="live-card__text"><%= @live_schedule.memo %></div>
+        <% else %>
+          <div class="live-card__empty">メモはまだありません</div>
+          <%= link_to "メモを追加", edit_live_schedule_path(@live_schedule), class: "live-card__action" %>
+        <% end %>
+      </div>
+      <div class="live-card live-card--media">
+        <div class="live-card__title">画像</div>
+        <div class="live-card__images">
+          <% if @live_schedule.timetable? %>
+            <div class="live-card__image-block">
+              <div class="live-card__image-label">タイムテーブル</div>
+              <a href="<%= @live_schedule.timetable.url %>" target="_blank" class="live-card__image">
+                <%= image_tag @live_schedule.timetable.url, class: "img-fluid", alt: "タイムテーブル画像" %>
+              </a>
+            </div>
+          <% end %>
+          <% if @live_schedule.announcement_image? %>
+            <div class="live-card__image-block">
+              <div class="live-card__image-label">告知画像</div>
+              <a href="<%= @live_schedule.announcement_image.url %>" target="_blank" class="live-card__image">
+                <%= image_tag @live_schedule.announcement_image.url, class: "img-fluid", alt: "告知画像" %>
+              </a>
+            </div>
+          <% end %>
+        </div>
+        <% unless @live_schedule.timetable? || @live_schedule.announcement_image? %>
+          <div class="live-card__empty">画像はまだありません</div>
+          <%= link_to "画像を追加", edit_live_schedule_path(@live_schedule), class: "live-card__action" %>
+        <% end %>
+      </div>
+  </div>
+</div>

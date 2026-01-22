@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Livehub</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="UTF-8">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <%= stylesheet_link_tag "application", media: "all", "data-turbolinks-track": "reload" %>
+    <%= stylesheet_pack_tag "application", media: "all", "data-turbolinks-track": "reload" %>
+    <%= javascript_pack_tag "application", "data-turbolinks-track": "reload" %>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.0.0/chart.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV["GOOGLE_MAPS_API_KEY"] %>&libraries=places&language=jp&callback=initMap" data-turbolinks-eval="false"></script>
+    <link rel="icon" href="/favicon.ico?v=2" id="favicon">
+  </head>
+  <body class="<%= [layout_mode == :auth ? 'devise-page' : nil, layout_mode == :app ? 'has-sidebar' : nil].compact.join(' ') %>">
+    <% case layout_mode %>
+    <% when :plain %>
+      <%= yield %>
+    <% when :auth %>
+      <%= render "shared/header" %>
+      <div class="page-with-header">
+        <%= yield %>
+      </div>
+    <% else %>
+      <%= render "shared/mobile_header" %>
+      <%= render "shared/sidebar" %>
+      <div class="sidebar-overlay" data-sidebar-overlay></div>
+      <div class="page-with-sidebar">
+        <%= yield %>
+      </div>
+    <% end %>
+    <% if flash.any? %>
+      <div class="flash">
+        <% flash.each do |key, message| %>
+          <div class="flash__message flash__message--<%= key %>">
+            <% if message.is_a?(Array) %>
+              <div class="flash__errors">
+                <% message.each do |entry| %>
+                  <span class="flash__error"><%= entry %></span>
+                <% end %>
+              </div>
+            <% else %>
+              <span><%= message %></span>
+            <% end %>
+            <button type="button" class="flash__close" data-flash-close aria-label="閉じる">×</button>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </body>
+</html>

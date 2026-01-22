@@ -1,0 +1,5 @@
+<% if @artist.favorited? %>
+  $(".fa-heart").removeClass("heart-black").addClass("heart-pink");
+<% else %>
+  $(".fa-heart").removeClass("heart-pink").addClass("heart-black");
+<% end %>

@@ -1,0 +1,127 @@
+<div class="main-container live-index">
+  <div class="live-index__header">
+    <div class="live-index__title">ライブ</div>
+    <%= link_to "＋ライブ作成", new_live_schedule_path, class: "live-index__cta" %>
+  </div>
+
+  <section class="live-index__section">
+    <div class="live-index__section-header">
+      <h2 class="live-index__section-title">次のライブ</h2>
+    </div>
+    <% if @next_live.present? %>
+      <div class="next-live">
+        <div class="next-live__main">
+          <div class="next-live__date">
+            <span class="next-live__month"><%= l(@next_live.date, format: "%-m月") %></span>
+            <span class="next-live__day"><%= l(@next_live.date, format: "%-d日") %></span>
+          </div>
+          <div class="next-live__info">
+            <div class="next-live__title"><%= @next_live.name %></div>
+            <% if @next_live.artist.present? %>
+              <div class="next-live__artist"><%= @next_live.artist.display_name %></div>
+            <% end %>
+            <div class="next-live__meta">
+              <span><%= @next_live.venue.name %><% if @next_live.venue.area.present? %>（<%= @next_live.venue.area %>）<% end %></span>
+              <% if @next_live.open_time.present? && @next_live.start_time.present? %>
+                <span>OPEN <%= @next_live.open_time.strftime("%H:%M") %> / START <%= @next_live.start_time.strftime("%H:%M") %></span>
+              <% elsif @next_live.open_time.present? %>
+                <span>OPEN <%= @next_live.open_time.strftime("%H:%M") %></span>
+              <% elsif @next_live.start_time.present? %>
+                <span>START <%= @next_live.start_time.strftime("%H:%M") %></span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="next-live__aside">
+          <div class="next-live__badges">
+            <%= render "shared/planned_live_badges", live_schedule: @next_live %>
+          </div>
+          <div class="next-live__actions">
+            <%= link_to "詳細を見る", live_schedule_path(@next_live), class: "live-index__secondary" %>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="live-index__empty">次のライブはまだ登録されていません</div>
+    <% end %>
+  </section>
+
+  <section class="live-index__section">
+    <div class="live-index__section-header">
+      <h2 class="live-index__section-title">今後のライブ予定</h2>
+      <div class="live-index__section-actions">
+        <span class="live-index__count"><%= @upcoming_lives.size %>件</span>
+        <%= link_to "ライブ予定一覧→", planned_live_schedules_path, class: "live-index__link" %>
+      </div>
+    </div>
+    <% if @upcoming_lives.any? %>
+      <div class="live-list">
+        <% @upcoming_lives.each do |live_schedule| %>
+          <a href="<%= live_schedule_path(live_schedule) %>" class="live-list__item">
+            <div class="live-list__date">
+              <span class="live-list__date-main"><%= l(live_schedule.date, format: "%-m/%-d") %></span>
+              <span class="live-list__date-sub"><%= l(live_schedule.date, format: "%a") %></span>
+            </div>
+            <div class="live-list__body">
+              <div class="live-list__title"><%= live_schedule.name %></div>
+              <div class="live-list__sub">
+                <span><%= live_schedule.venue.name %></span>
+                <% if live_schedule.venue.area.present? %>
+                  <span class="live-list__muted">（<%= live_schedule.venue.area %>）</span>
+                <% end %>
+                <% if live_schedule.artist.present? %>
+                  <span class="live-list__muted">/ <%= live_schedule.artist.display_name %></span>
+                <% end %>
+              </div>
+            </div>
+            <%= render "shared/planned_live_badges", live_schedule: live_schedule %>
+          </a>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="live-index__empty">今後の予定はまだありません</div>
+    <% end %>
+  </section>
+
+  <section class="live-index__section">
+    <div class="live-index__section-header">
+      <h2 class="live-index__section-title">最近のライブ記録</h2>
+      <div class="live-index__section-actions">
+        <span class="live-index__count"><%= @recent_records.size %>件</span>
+        <%= link_to "ライブ記録一覧→", records_live_schedules_path, class: "live-index__link" %>
+      </div>
+    </div>
+    <% if @recent_records.any? %>
+      <div class="live-list">
+        <% @recent_records.each do |live_schedule| %>
+          <a href="<%= live_schedule_path(live_schedule) %>" class="live-list__item">
+            <div class="live-list__date">
+              <span class="live-list__date-main"><%= l(live_schedule.date, format: "%-m/%-d") %></span>
+              <span class="live-list__date-sub"><%= l(live_schedule.date, format: "%a") %></span>
+            </div>
+            <div class="live-list__body">
+              <div class="live-list__title"><%= live_schedule.name %></div>
+              <div class="live-list__sub">
+                <span><%= live_schedule.venue.name %></span>
+                <% if live_schedule.venue.area.present? %>
+                  <span class="live-list__muted">（<%= live_schedule.venue.area %>）</span>
+                <% end %>
+              </div>
+            </div>
+            <div class="live-list__badges">
+              <% if live_schedule.memo.present? %>
+                <span class="live-badge">メモあり</span>
+              <% end %>
+              <% if live_schedule.timetable.present? || live_schedule.announcement_image.present? %>
+                <span class="live-badge">画像あり</span>
+              <% end %>
+              <span class="live-badge live-badge--record">記録</span>
+            </div>
+          </a>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="live-index__empty">最近の記録はまだありません</div>
+    <% end %>
+  </section>
+</div>

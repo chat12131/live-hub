@@ -1,0 +1,42 @@
+<div class="main-container artists-index">
+  <div class="artists-index__header">
+    <div class="artists-index__title">アーティスト</div>
+  </div>
+  <section class="artists-index__section artists-index__section--form">
+    <div class="artists-index__form live-form artist-form">
+      <%= render "shared/artist_form_card", artist: @artist %>
+    </div>
+  </section>
+  <section class="artists-index__section">
+    <div class="artists-index__section-header">
+      <h2 class="artists-index__section-title">最近登録したアーティスト</h2>
+      <div class="artists-index__section-actions">
+        <%= link_to "アーティスト一覧→", list_artists_path, class: "artists-index__link" %>
+      </div>
+    </div>
+    <% if @recent_artists.any? %>
+      <div class="artists-list">
+        <% @recent_artists.each do |artist| %>
+          <div class="artists-card clickable" data-href="<%= artist_path(artist) %>">
+            <div class="artists-card__header">
+              <div class="artists-card__title"><%= artist.combined_name %></div>
+              <div class="artists-card__actions">
+                <%= link_to edit_artist_path(artist), class: "artists-card__action" do %>
+                  <i class="fas fa-edit"></i>
+                <% end %>
+                <%= link_to artist, method: :delete, data: { confirm: "本当に削除しますか？" }, class: "artists-card__action" do %>
+                  <i class="fa fa-trash"></i>
+                <% end %>
+              </div>
+            </div>
+            <div class="artists-card__meta">
+              <span>作成日: <%= artist.created_at.strftime("%Y-%m-%d") %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="artists-index__empty">まだ登録がありません</div>
+    <% end %>
+  </section>
+</div>

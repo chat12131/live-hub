@@ -1,0 +1,17 @@
+<div class="main">
+  <div class="login">
+    <h1>ログイン</h1>
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <%= render "shared/error_messages", resource: resource %>
+      <div class="field">
+        <%= f.text_field :email, autofocus: true, autocomplete: "email", placeholder: "メールアドレス", required: "required" %>
+      </div>
+      <div class="field">
+        <%= f.password_field :password, autocomplete: "current-password", placeholder: "パスワード", required: "required" %>
+      </div>
+      <div class="actions">
+        <%= f.submit "ログイン", class: "btn btn-primary btn-block btn-large" %>
+      </div>
+    <% end %>
+  </div>
+</div>

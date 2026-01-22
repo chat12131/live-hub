@@ -1,0 +1,23 @@
+<nav class="sidebar" id="mobile-sidebar">
+  <div class="sidebar__brand">
+    <%= link_to "Livehub", root_path, class: "sidebar__brand-link" %>
+  </div>
+  <ul class="sidebar__nav">
+    <% if user_signed_in? %>
+      <li class="sidebar__item"><%= link_to "ライブ", live_schedules_path, class: "sidebar__link" %></li>
+      <li class="sidebar__item sidebar__item--sub"><%= link_to "ライブを作成", new_live_schedule_path, class: "sidebar__link sidebar__link--sub" %></li>
+      <li class="sidebar__item sidebar__item--sub"><%= link_to "ライブ予定一覧", planned_live_schedules_path, class: "sidebar__link sidebar__link--sub" %></li>
+      <li class="sidebar__item sidebar__item--sub"><%= link_to "ライブ記録一覧", records_live_schedules_path, class: "sidebar__link sidebar__link--sub" %></li>
+      <li class="sidebar__item"><%= link_to "グッズ記録", goods_path, class: "sidebar__link" %></li>
+      <li class="sidebar__item"><%= link_to "統計", statistics_path, class: "sidebar__link" %></li>
+      <li class="sidebar__item"><%= link_to "登録アーティスト", artists_path, class: "sidebar__link" %></li>
+      <li class="sidebar__spacer"></li>
+      <li class="sidebar__item"><%= link_to "マイページ", mypage_path, class: "sidebar__link" %></li>
+      <li class="sidebar__item"><%= link_to "ログアウト", destroy_user_session_path, method: :delete, class: "sidebar__link" %></li>
+    <% else %>
+      <li class="sidebar__item"><%= link_to "新規登録", new_user_registration_path, class: "sidebar__link" %></li>
+      <li class="sidebar__item"><%= link_to "ログイン", new_user_session_path, class: "sidebar__link" %></li>
+      <li class="sidebar__item"><%= link_to "ゲスト用", users_guest_sign_in_path, method: :post, class: "sidebar__link" %></li>
+    <% end %>
+  </ul>
+</nav>

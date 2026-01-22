@@ -1,0 +1,25 @@
+<%= render "shared/header" %>
+<div class="home">
+  <div class="main">
+    <div class="top-word">
+      <h1>Livehub</h1>
+    </div>
+    <div class="links">
+      <% if user_signed_in? %>
+        <div class="links-top">
+          <%= link_to "ライブ", live_schedules_path, class: "round-button" %>
+          <%= link_to "グッズ記録", goods_path, class: "round-button" %>
+        </div>
+        <div class="links-bottom">
+          <%= link_to "統計", statistics_path, class: "square-button" %>
+        </div>
+      <% else %>
+        <div class="links-top">
+          <%= link_to "新規登録", new_user_registration_path, class: "round-button" %>
+          <%= link_to "ログイン", new_user_session_path, class: "round-button" %>
+          <%= link_to "ゲスト用", users_guest_sign_in_path, method: :post, class: "round-button" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,24 @@
+<div class="live-list__badges">
+  <% if live_schedule.ticket_price.present? %>
+    <span class="live-badge">チケ <%= live_schedule.ticket_price %>円</span>
+  <% end %>
+  <% if live_schedule.drink_price.present? %>
+    <span class="live-badge">ドリ <%= live_schedule.drink_price %>円</span>
+  <% end %>
+  <% status = live_schedule.ticket_status %>
+  <% status_class =
+    case status
+    when "購入済"
+      "live-badge--status-purchased"
+    when "未購入"
+      "live-badge--status-unpurchased"
+    when "当日のみ"
+      "live-badge--status-onsite"
+    when "チケ無し"
+      "live-badge--status-none"
+    else
+      ""
+    end %>
+  <span class="live-badge <%= status_class %>"><%= status ? status.humanize : "未定" %></span>
+  <span class="live-badge live-badge--days"><%= live_schedule.days_until_label %></span>
+</div>

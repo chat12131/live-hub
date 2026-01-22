@@ -1,0 +1,47 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: livehub_development
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  web:
+    build: .
+    env_file:
+      - .env
+    environment:
+      RAILS_ENV: development
+      MYSQL_HOST: db
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: password
+      WEBPACKER_DEV_SERVER_HOST: webpacker
+      WEBPACKER_DEV_SERVER_PORT: 3035
+    volumes:
+      - .:/app:cached
+      - bundle:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - webpacker
+
+  webpacker:
+    build: .
+    command: bash -lc "bin/webpack-dev-server"
+    environment:
+      RAILS_ENV: development              # ★これを追加
+      WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
+    volumes:
+      - .:/app:cached
+      - bundle:/usr/local/bundle
+    ports:
+      - "3035:3035"
+
+volumes:
+  mysql-data:
+  bundle:

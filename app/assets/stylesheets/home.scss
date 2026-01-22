@@ -1,0 +1,110 @@
+
+.main {
+  width: 100%;
+  background-image: image-url("homelive.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-height: 100vh;
+}
+
+.top-word h1 {
+  text-align: center;
+  padding-top: 70px;
+  color: white;
+  font-size: 100px;
+  letter-spacing: 0.09em;
+  font-family: cursive;
+}
+
+.links {
+  padding-top: 150px;
+  font-size: 50px;
+  font-family:"Yu Gothic", "游ゴシック";
+  font-weight: 100;
+}
+
+.links a {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.links-top {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 58%;
+  margin: auto;
+}
+
+.links-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.round-button,
+.square-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid white;
+  box-shadow: 0 0 0 1px black;
+  color: white;
+  background-color: transparent;
+  width: fit-content;
+}
+
+.round-button {
+  border-radius: 70%;
+  padding: 70px 30px;
+}
+
+.square-button {
+  border-radius: 15%;
+  padding: 10px 80px;
+  white-space: nowrap;
+}
+
+.round-button:hover,
+.square-button:hover {
+  color: white;
+  text-decoration: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
+  background-color: rgba(110, 109, 109, 0.2);
+}
+
+@media (max-width: 768px) {
+  .links-top {
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    width: 90%;
+  }
+
+  .links {
+    padding-top: 35px;
+    font-size: 35px;
+  }
+
+  .round-button {
+    width: 80%;
+    padding: 20px;
+    text-align: center;
+  }
+
+
+  .links-bottom {
+    margin-top: 30px;
+  }
+
+  .square-button {
+    width: 80%;
+    padding: 0;
+  }
+
+  .top-word h1 {
+    font-size: 60px;
+  }
+}

@@ -1,0 +1,34 @@
+<div class="main-container artists-index">
+  <div class="artists-index__header">
+    <div class="artists-index__title">アーティスト一覧</div>
+  </div>
+  <section class="artists-index__section">
+    <div class="artists-index__section-header">
+      <h2 class="artists-index__section-title">すべてのアーティスト</h2>
+    </div>
+    <% if @artists.any? %>
+      <div class="artists-list">
+        <% @artists.each do |artist| %>
+          <div class="artists-card clickable" data-href="<%= artist_path(artist) %>">
+            <div class="artists-card__header">
+              <div class="artists-card__title"><%= artist.combined_name %></div>
+              <div class="artists-card__actions">
+                <%= link_to edit_artist_path(artist), class: "artists-card__action" do %>
+                  <i class="fas fa-edit"></i>
+                <% end %>
+                <%= link_to artist, method: :delete, data: { confirm: "本当に削除しますか？" }, class: "artists-card__action" do %>
+                  <i class="fa fa-trash"></i>
+                <% end %>
+              </div>
+            </div>
+            <div class="artists-card__meta">
+              <span>作成日: <%= artist.created_at.strftime("%Y-%m-%d") %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="artists-index__empty">まだ登録がありません</div>
+    <% end %>
+  </section>
+</div>

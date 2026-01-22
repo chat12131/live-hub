@@ -1,0 +1,10 @@
+<%= render "shared/live_list",
+  title: "ライブ記録一覧",
+  empty_message: "最近の記録はまだありません",
+  cta_label: "ライブ",
+  cta_path: live_schedules_path,
+  lives: @record_lives,
+  sort_value: @sort,
+  sort_options: [["日付が新しい順", "date_desc"], ["日付が古い順", "date_asc"], ["作成日が新しい順", "created_desc"]],
+  sort_path: records_live_schedules_path,
+  variant: :record %>

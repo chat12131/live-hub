@@ -1,0 +1,32 @@
+<div class="main-container">
+  <div class="artist-index">
+    <div class="mb-4 d-flex justify-content-between">
+      <%= link_to new_artist_path, class: "btn btn-success btn-lg mr-3" do %>
+        <i class="fas fa-plus-circle"></i> 新規アーティスト作成
+      <% end %>
+      <%= link_to artists_path, class: "btn btn-info btn-lg" do %>
+        全アーティスト一覧
+      <% end %>
+    </div>
+    <div class="row">
+      <% @favorite_artists.each do |artist| %>
+        <div class="col-md-4">
+          <div class="card mb-4 clickable" data-href="<%= artist_path(artist) %>">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                  <%= artist.combined_name %>
+                </h5>
+                <%= link_to "編集", edit_artist_path(artist), class: "btn btn-primary" %>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <p class="card-text mb-0">作成日: <%= artist.created_at.strftime("%Y-%m-%d") %></p>
+                <%= link_to "削除", artist, method: :delete, data: { confirm: "本当に削除しますか？" }, class: "btn btn-danger" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

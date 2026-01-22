@@ -1,0 +1,56 @@
+<div class="main-container goods-index">
+  <div class="goods-index__header">
+    <div class="goods-index__title">グッズ一覧</div>
+  </div>
+  <section class="goods-index__section">
+    <div class="goods-index__section-header">
+      <h2 class="goods-index__section-title">すべてのグッズ</h2>
+      <div class="goods-index__section-actions">
+        <span class="goods-index__count"><%= @goods.size %>件</span>
+      </div>
+    </div>
+    <% if @goods.any? %>
+      <div class="goods-list">
+        <% @goods.each do |good| %>
+          <div class="goods-card">
+            <div class="goods-card__header">
+              <div class="goods-card__title"><%= good.category.name if good.category.present? %></div>
+              <div class="goods-card__qty"><%= good.quantity %>個</div>
+              <div class="goods-card__actions">
+                <%= link_to edit_good_path(good), class: "goods-card__action" do %>
+                  <i class="fas fa-edit"></i>
+                <% end %>
+                <%= link_to good, method: :delete, data: { confirm: "本当に削除して良いですか?" }, class: "goods-card__action" do %>
+                  <i class="fa fa-trash"></i>
+                <% end %>
+              </div>
+            </div>
+            <div class="goods-card__meta">
+              <% if good.name? %>
+                <span><%= good.name %></span>
+              <% end %>
+              <% if good.price.present? %>
+                <span>値段: <%= good.price %></span>
+                <span>合計: <%= good.quantity * good.price %></span>
+              <% end %>
+              <% if good.artist.present? %>
+                <span>アーティスト: <%= good.artist.display_name %></span>
+              <% end %>
+              <% if good.member.present? %>
+                <span>メンバー: <%= good.member.name %></span>
+              <% end %>
+              <% if good.live_schedule.present? %>
+                <span>購入したライブ: <%= good.live_schedule.name %></span>
+              <% end %>
+              <% if good.date.present? %>
+                <span>購入日: <%= good.date %></span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="goods-index__empty">記録がまだありません</div>
+    <% end %>
+  </section>
+</div>

@@ -1,0 +1,17 @@
+
+.spec {
+  width: 80%;
+  margin: auto;
+  background-color: white;
+  padding: 30px;
+  min-height: 100vh
+}
+
+@media (max-width: 1023px) {
+  .spec {
+    width: 100%;
+  }
+  .bar{
+    height: 150px !important;
+  }
+}

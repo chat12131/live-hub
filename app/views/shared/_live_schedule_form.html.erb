@@ -1,0 +1,247 @@
+<div class="main-container live-form">
+  <div class="card live-form__card">
+    <div class="card-body live-form__body">
+      <div class="live-form__title">ライブ予定</div>
+      <%= render "shared/error_messages", resource: live_schedule %>
+      <%= form_with model: live_schedule, html: { class: "live-form__form" } do |f| %>
+        <% venue_error = (live_schedule.errors.full_messages_for(:venue) + live_schedule.errors.full_messages_for(:venue_id)).first %>
+        <% venue_error ||= live_schedule.venue&.errors&.full_messages_for(:name)&.first %>
+        <% date_error = live_schedule.errors.full_messages_for(:date).first %>
+        <% artist_error = live_schedule.errors.full_messages_for(:artist_id).first %>
+        <% name_error = live_schedule.errors.full_messages_for(:name).first %>
+        <div class="live-form__section live-form__section--primary">
+          <div class="live-form__section-title live-form__section-title--required">必須</div>
+          <div class="live-form__grid live-form__grid--primary">
+            <%= f.fields_for :venue do |venue_fields| %>
+              <div class="form-group live-form__field live-form__field--wide text-center">
+                <label for="venue-name-display">会場 <span class="text-danger">*</span></label>
+                <div class="cube-field cube-field--primary <%= 'is-invalid' if venue_error %>">
+                  <div class="cube-field__shell">
+                    <input type="text" id="venue-name-display" class="form-control Autocomplete <%= 'is-invalid' if venue_error %>" placeholder="会場名（例：Zepp Nagoya）" value="<%= live_schedule.venue.name %>">
+                  </div>
+                </div>
+                <%= venue_fields.hidden_field :name, id: "nameField" %>
+                <%= venue_fields.hidden_field :google_place_id, id: "google_place_idField" %>
+                <%= venue_fields.hidden_field :area, id: "areaField" %>
+                <%= venue_fields.hidden_field :latitude, id: "latitudeField" %>
+                <%= venue_fields.hidden_field :longitude, id: "longitudeField" %>
+              </div>
+            <% end %>
+            <div class="form-group live-form__field text-center">
+              <%= f.label :date, "日付" %> <span class="text-danger">*</span>
+              <div class="cube-field cube-field--primary <%= 'is-invalid' if date_error %>">
+                <div class="cube-field__shell">
+                  <%= f.text_field :date, class: "form-control datepicker #{'is-invalid' if date_error}", placeholder: "例：2024-10-01" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="live-form__section">
+          <div class="live-form__section-title">基本情報</div>
+          <div class="live-form__grid">
+            <div class="form-group live-form__field text-center">
+              <%= f.label :name, "イベント名" %>
+              <div class="cube-field <%= 'is-invalid' if name_error %>">
+                <div class="cube-field__shell">
+                  <%= f.text_field :name, class: "form-control #{'is-invalid' if name_error}", placeholder: "例：ワンマンライブ" %>
+                </div>
+                <% if name_error.present? %>
+                  <div class="field-error"><%= name_error %></div>
+                <% end %>
+              </div>
+            </div>
+            <div class="form-group live-form__field">
+              <div class="d-flex justify-content-between align-items-center text-center">
+                <%= f.label :artist_id, "アーティスト" %>
+                <%= link_to "新しいアーティストを追加", new_artist_path(from: request.fullpath), class: "btn btn-secondary btn-sm mb-1" %>
+              </div>
+              <div class="cube-field <%= 'is-invalid' if artist_error %>">
+                <div class="cube-field__shell">
+                  <%= f.select :artist_id, current_user.artists.all.collect { |artist| [artist.display_name, artist.id] }, { include_blank: "-アーティストを選択-", selected: live_schedule.artist_id || "" }, class: "form-control #{'is-invalid' if artist_error}" %>
+                </div>
+                <% if artist_error.present? %>
+                  <div class="field-error"><%= artist_error %></div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% open_time_error = live_schedule.errors.full_messages_for(:open_time).first %>
+        <% start_time_error = live_schedule.errors.full_messages_for(:start_time).first %>
+        <% time_errors = open_time_error.present? || start_time_error.present? %>
+        <% time_summary = [live_schedule.open_time&.strftime("%H:%M")&.then { |t| "OPEN #{t}" }, live_schedule.start_time&.strftime("%H:%M")&.then { |t| "START #{t}" }].compact.join(" / ") %>
+        <div class="optional-section-grid">
+        <details class="optional-section" <%= "open" if time_errors %>>
+          <summary class="optional-section__summary">
+            <span class="optional-section__label">時間（オプション）</span>
+            <span class="optional-section__summary-text"><%= time_summary.presence %></span>
+          </summary>
+          <div class="optional-section__body">
+            <div class="live-form__grid">
+              <div class="form-group live-form__field text-center">
+                <%= f.label :open_time, "OPEN" %>
+                <div class="cube-field <%= 'is-invalid' if open_time_error %>">
+                  <div class="cube-field__shell">
+                    <%= f.text_field :open_time,  class: "timepicker #{'is-invalid' if open_time_error}", placeholder: "例：18:00" %>
+                  </div>
+                </div>
+                <% if open_time_error.present? %>
+                  <div class="field-error"><%= open_time_error %></div>
+                <% end %>
+              </div>
+              <div class="form-group live-form__field text-center">
+                <%= f.label :start_time, "START" %>
+                <div class="cube-field <%= 'is-invalid' if start_time_error %>">
+                  <div class="cube-field__shell">
+                    <%= f.text_field :start_time, class: "timepicker #{'is-invalid' if start_time_error}", placeholder: "例：19:00" %>
+                  </div>
+                </div>
+                <% if start_time_error.present? %>
+                  <div class="field-error"><%= start_time_error %></div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </details>
+        <% ticket_sale_date_error = live_schedule.errors.full_messages_for(:ticket_sale_date).first %>
+        <% ticket_price_error = live_schedule.errors.full_messages_for(:ticket_price).first %>
+        <% drink_price_error = live_schedule.errors.full_messages_for(:drink_price).first %>
+        <% ticket_status_error = live_schedule.errors.full_messages_for(:ticket_status).first %>
+        <% ticket_errors = ticket_sale_date_error.present? || ticket_price_error.present? || drink_price_error.present? || ticket_status_error.present? %>
+        <% ticket_summary = [] %>
+        <% ticket_summary << "発売 #{live_schedule.ticket_sale_date.strftime("%m/%d %H:%M")}" if live_schedule.ticket_sale_date.present? %>
+        <% ticket_summary << "チケ #{live_schedule.ticket_price}円" if live_schedule.ticket_price.present? %>
+        <% ticket_summary << "ドリ #{live_schedule.drink_price}円" if live_schedule.drink_price.present? %>
+        <% ticket_summary_text = ticket_summary.join(" / ") %>
+        <details class="optional-section" <%= "open" if ticket_errors %>>
+          <summary class="optional-section__summary">
+            <span class="optional-section__label">チケット（オプション）</span>
+            <span class="optional-section__summary-text"><%= ticket_summary_text.presence %></span>
+          </summary>
+          <div class="optional-section__body">
+            <div class="form-group mt-3">
+              <div class="ticket-status-label">
+                <%= f.label :ticket_status, "チケット購入状況" %>
+              </div>
+              <div class="ticket-purchase <%= 'is-invalid' if ticket_status_error %>">
+                <div class="ticket-purchase__options">
+                  <% LiveSchedule.ticket_statuses.keys.each do |status| %>
+                    <label class="ticket-purchase__option">
+                      <%= f.radio_button :ticket_status, status, id: "ticket_status_#{status}", checked: @live_schedule.ticket_status == status, class: "ticket-purchase__input" %>
+                      <span class="ticket-purchase__pill"><%= status.humanize %></span>
+                    </label>
+                  <% end %>
+                </div>
+              </div>
+              <% if ticket_status_error.present? %>
+                <div class="field-error text-center"><%= ticket_status_error %></div>
+              <% end %>
+            </div>
+            <div class="live-form__grid live-form__grid--ticket">
+              <div class="form-group live-form__field ticket-field text-center">
+                <%= f.label :ticket_sale_date, "チケット発売日時" %>
+                <div class="cube-field <%= 'is-invalid' if ticket_sale_date_error %>">
+                  <div class="cube-field__shell">
+                    <%= f.text_field :ticket_sale_date, class: "flatpickr #{'is-invalid' if ticket_sale_date_error}", placeholder: "例：2024-10-01 18:00" %>
+                  </div>
+                </div>
+                <% if ticket_sale_date_error.present? %>
+                  <div class="field-error"><%= ticket_sale_date_error %></div>
+                <% end %>
+              </div>
+              <div class="form-group live-form__field ticket-field text-center">
+                <%= f.label :ticket_price, "チケット代" %>
+                <div class="cube-field <%= 'is-invalid' if ticket_price_error %>">
+                  <div class="cube-field__shell">
+                    <%= f.number_field :ticket_price, class: "form-control #{'is-invalid' if ticket_price_error}", id: "ticket_price_input" %>
+                  </div>
+                </div>
+                <% if ticket_price_error.present? %>
+                  <div class="field-error"><%= ticket_price_error %></div>
+                <% end %>
+              </div>
+              <div class="form-group live-form__field ticket-field text-center">
+                <%= f.label :drink_price, "ドリンク代" %>
+                <div class="cube-field <%= 'is-invalid' if drink_price_error %>">
+                  <div class="cube-field__shell">
+                    <%= f.number_field :drink_price, class: "form-control #{'is-invalid' if drink_price_error}" %>
+                  </div>
+                </div>
+                <% if drink_price_error.present? %>
+                  <div class="field-error"><%= drink_price_error %></div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </details>
+        <% timetable_error = live_schedule.errors.full_messages_for(:timetable).first %>
+        <% announcement_image_error = live_schedule.errors.full_messages_for(:announcement_image).first %>
+        <% image_errors = timetable_error.present? || announcement_image_error.present? %>
+        <% image_summary = [] %>
+        <% image_summary << "タイムテーブル" if live_schedule.timetable? %>
+        <% image_summary << "告知" if live_schedule.announcement_image? %>
+        <% image_summary_text = image_summary.join(" / ") %>
+        <details class="optional-section" <%= "open" if image_errors %>>
+          <summary class="optional-section__summary">
+            <span class="optional-section__label">画像（オプション）</span>
+            <span class="optional-section__summary-text"><%= image_summary_text.presence %></span>
+          </summary>
+          <div class="optional-section__body">
+            <div class="form-row liveimage text-center">
+              <div class="label-box__inner <%= 'is-invalid' if timetable_error %>">
+                  <label class="mealpicture">
+                      <span class="upload-icon"><i class="fas fa-upload"></i></span>
+                      <span class="upload-text">タイムテーブル画像を追加</span>
+                      <%= f.file_field :timetable, class: "input-default js-image-input", data: { preview_target: "timetable" }, accept: "image/*" %>
+                      <div class="boxFileSelect"></div>
+                  </label>
+                  <img class="js-image-preview" data-preview="timetable" style="display:none;" alt="タイムテーブル画像プレビュー">
+                  <% if timetable_error.present? %>
+                    <div class="field-error"><%= timetable_error %></div>
+                  <% end %>
+              </div>
+              <div class="label-box__inner <%= 'is-invalid' if announcement_image_error %>">
+                  <label class="mealpicture">
+                      <span class="upload-icon"><i class="fas fa-upload"></i></span>
+                      <span class="upload-text">告知画像を追加</span>
+                      <%= f.file_field :announcement_image, class: "input-default js-image-input", data: { preview_target: "announcement" }, accept: "image/*" %>
+                      <div class="boxFileSelect"></div>
+                  </label>
+                  <img class="js-image-preview" data-preview="announcement" style="display:none;" alt="告知画像プレビュー">
+                  <% if announcement_image_error.present? %>
+                    <div class="field-error"><%= announcement_image_error %></div>
+                  <% end %>
+              </div>
+            </div>
+          </div>
+        </details>
+        <% memo_error = live_schedule.errors.full_messages_for(:memo).first %>
+        <% memo_errors = memo_error.present? %>
+        <% memo_summary = live_schedule.memo.to_s.strip %>
+        <details class="optional-section" <%= "open" if memo_errors %>>
+          <summary class="optional-section__summary">
+            <span class="optional-section__label">メモ（オプション）</span>
+            <span class="optional-section__summary-text"><%= memo_summary.present? ? memo_summary.truncate(24) : "" %></span>
+          </summary>
+          <div class="optional-section__body">
+            <div class="form-group text-center">
+              <div class="cube-field <%= 'is-invalid' if memo_error %>">
+                <div class="cube-field__shell">
+                  <%= f.text_area :memo, class: "form-control memo-autogrow #{'is-invalid' if memo_error}", rows: 2 %>
+                </div>
+              </div>
+              <% if memo_error.present? %>
+                <div class="field-error"><%= memo_error %></div>
+              <% end %>
+            </div>
+          </div>
+        </details>
+        </div>
+        <div class="form-group">
+          <%= f.submit "登録", class: "live-form__submit" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

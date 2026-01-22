@@ -1,0 +1,116 @@
+<div class="card live-form__card">
+  <div class="card-body live-form__body">
+    <div class="live-form__title">アーティスト</div>
+    <%= render "shared/error_messages", resource: artist %>
+    <%= form_with model: artist, html: { class: "live-form__form" } do |f| %>
+      <% name_error = artist.errors.full_messages_for(:name).first %>
+      <div class="live-form__section live-form__section--primary">
+        <div class="live-form__section-title live-form__section-title--required">必須</div>
+        <div class="live-form__grid artist-form__grid--primary">
+          <div class="form-group live-form__field">
+            <div class="artist-form__label-row">
+              <%= f.label :name, raw('アーティスト名 <span class="text-danger">*</span>'), class: "live-form__label" %>
+              <div class="artist-form__toggle custom-checkbox label-checkbox-wrapper">
+                <%= f.label :favorited, "お気に入り", class: "grey-label" %>
+                <%= f.check_box :favorited %>
+              </div>
+            </div>
+            <div class="cube-field cube-field--primary <%= 'is-invalid' if name_error %>">
+              <div class="cube-field__shell">
+                <%= f.text_field :name, class: "form-control #{'is-invalid' if name_error}", placeholder: "例：ミセス" %>
+              </div>
+            </div>
+          </div>
+          <div class="form-group live-form__field">
+            <div class="artist-form__label-row">
+              <%= f.label :nickname, "ニックネーム", class: "live-form__label" %>
+              <div class="artist-form__toggle custom-checkbox label-checkbox-wrapper">
+                <%= f.label :nickname_mode, "ニックネーム表示", class: "grey-label" %>
+                <%= f.check_box :nickname_mode %>
+              </div>
+            </div>
+            <div class="cube-field cube-field--primary">
+              <div class="cube-field__shell">
+                <%= f.text_field :nickname, class: "form-control", placeholder: "例：ミセス" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <details class="optional-section">
+        <summary class="optional-section__summary">
+          <span class="optional-section__label">オプション</span>
+          <span class="optional-section__summary-text">ジャンル / 結成日 / 初ライブ参加日</span>
+        </summary>
+        <div class="optional-section__body">
+          <div class="live-form__grid artist-form__grid--secondary">
+            <div class="form-group live-form__field">
+              <%= f.label :genre, "ジャンル", class: "live-form__label" %>
+              <div class="cube-field">
+                <div class="cube-field__shell">
+                  <%= f.select :genre, [["ジャンルを選択", ""], "ロック", "Jpop", "hiphop", "アイドル", "メタル", "ビジュアル系", "その他"], {}, class: "form-control" %>
+                </div>
+              </div>
+            </div>
+            <div class="form-group live-form__field">
+              <%= f.label :founding_date, "結成日", class: "live-form__label" %>
+              <div class="cube-field">
+                <div class="cube-field__shell">
+                  <%= f.text_field :founding_date, class: "form-control datepicker", placeholder: "例：2008-01-01" %>
+                </div>
+              </div>
+            </div>
+            <div class="form-group live-form__field">
+              <%= f.label :first_show_date, "初ライブ参加日", class: "live-form__label" %>
+              <div class="cube-field">
+                <div class="cube-field__shell">
+                  <%= f.text_field :first_show_date, class: "form-control datepicker", placeholder: "例：2009-03-01" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+      <details class="optional-section">
+        <summary class="optional-section__summary">
+          <span class="optional-section__label">オプション</span>
+          <span class="optional-section__summary-text">メンバー追加 / 画像 / メモ</span>
+        </summary>
+          <div class="optional-section__body">
+            <div class="live-form__grid artist-form__grid--optional">
+              <div class="form-group live-form__field">
+                <%= f.label :members, "メンバー追加", class: "live-form__label" %>
+                <div class="artist-member">
+                  <div class="cube-field artist-member__field">
+                    <div class="cube-field__shell">
+                      <input type="text" id="member-input" class="form-control" placeholder="メンバーの名前">
+                    </div>
+                  </div>
+                  <button type="button" id="add-member" class="artist-member__button">追加</button>
+                </div>
+              </div>
+              <div class="form-group live-form__field artist-form__option--image-compact">
+                <%= f.label :image, "画像を追加", class: "live-form__label" %>
+                <div class="liveimage artist-image">
+                  <div class="label-box__inner">
+                    <label class="mealpicture">アーティスト画像を追加 <i class="fas fa-upload upload-icon"></i>
+                        <%= f.file_field :image, class:"input-default" %>
+                        <div class="boxFileSelect"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group live-form__field artist-form__option--memo-wide">
+                <%= f.label :memo, "メモ", class: "live-form__label" %>
+                <%= f.text_area :memo, class: "form-control memo", rows: 4, placeholder: "メモがあれば入力" %>
+              </div>
+            </div>
+          </div>
+        </details>
+      <div class="form-group">
+        <%= f.hidden_field :from, value: params[:from] %>
+        <%= f.submit "保存", class: "live-form__submit" %>
+      </div>
+    <% end %>
+  </div>
+</div>

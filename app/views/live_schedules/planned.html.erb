@@ -1,0 +1,10 @@
+<%= render "shared/live_list",
+  title: "ライブ予定一覧",
+  empty_message: "今後の予定はまだありません",
+  cta_label: "＋ライブ作成",
+  cta_path: new_live_schedule_path,
+  lives: @planned_lives,
+  sort_value: @sort,
+  sort_options: [["日付が近い", "date_asc"], ["日付が遠い", "date_desc"], ["作成日が新しい順", "created_desc"]],
+  sort_path: planned_live_schedules_path,
+  variant: :planned %>
