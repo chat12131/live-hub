@@ -81,7 +81,7 @@ class LiveSchedulesController < ApplicationController
     end
 
     if @live_schedule.save
-      redirect_to live_schedules_path
+      redirect_to live_schedules_path, notice: "ライブを作成しました。"
     else
       Rails.logger.debug @live_schedule.errors.full_messages
       render :new
@@ -128,7 +128,7 @@ class LiveSchedulesController < ApplicationController
 
   def destroy
     @live_schedule.destroy
-    redirect_to live_schedules_path
+    redirect_to live_schedules_path, notice: "ライブを削除しました。"
   end
 
   private

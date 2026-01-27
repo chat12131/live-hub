@@ -62,7 +62,7 @@ class GoodsController < ApplicationController
     end
 
     if @good.save
-      redirect_to goods_path
+      redirect_to goods_path, notice: "グッズを作成しました。"
     else
       goods_scope = current_user.goods.order(created_at: :desc)
       @goods = goods_scope.to_a
@@ -113,7 +113,7 @@ class GoodsController < ApplicationController
 
   def destroy
     @good.destroy
-    redirect_to goods_path, notice: 'Good was successfully destroyed.'
+    redirect_to goods_path, notice: "グッズを削除しました。"
   end
 
   private

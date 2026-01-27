@@ -35,7 +35,7 @@ class ArtistsController < ApplicationController
     @artist = current_user.artists.build(artist_params)
     if @artist.save
       redirect_target = (params[:artist][:from].presence || artists_path)
-      redirect_to "#{redirect_target}?selected_artist_id=#{@artist.id}"
+      redirect_to "#{redirect_target}?selected_artist_id=#{@artist.id}", notice: "アーティストを作成しました。"
     else
       artists_scope = current_user.artists.order(created_at: :desc)
       @artists = artists_scope.to_a
@@ -55,7 +55,7 @@ class ArtistsController < ApplicationController
 
   def destroy
     @artist.destroy
-    redirect_to artists_path
+    redirect_to artists_path, notice: "アーティストを削除しました。"
   end
 
   def favorites
