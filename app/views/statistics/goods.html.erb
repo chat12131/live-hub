@@ -1,0 +1,133 @@
+<div class="stats-ga stats-ga--detail">
+  <main class="stats-ga__main">
+    <header class="stats-ga__header">
+      <div>
+        <p class="stats-ga__eyebrow">Statistical Data</p>
+        <h1 class="stats-ga__title">グッズ統計</h1>
+        <p class="stats-ga__subtitle">グッズ購入の傾向をまとめて確認できます。</p>
+      </div>
+      <div class="stats-ga__header-actions">
+        <%= link_to "統計トップへ戻る", statistics_path, class: "stats-ga__back-link" %>
+      </div>
+    </header>
+
+    <section class="stats-ga__grid">
+      <div class="stats-ga__panel stats-ga__panel--wide">
+        <div class="stats-ga__panel-header">
+          <div>
+            <h2 class="stats-ga__panel-title">グッズ購入のサマリ</h2>
+          </div>
+        </div>
+        <div class="stats-ga__kpis">
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">グッズの総支出</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@goods_expense) %><span>円</span></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">今月の購入数</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@this_month_goods_count) %><span>回</span></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">最多購入カテゴリ（今年）</div>
+            <div class="stats-ga__kpi-value stats-ga__kpi-value--text"><%= @year_top_category_name || "データなし" %></div>
+            <div class="stats-ga__kpi-subtext"><%= @year_top_category_name ? "#{@year_top_category_count}点" : "" %></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">支出が大きかった月</div>
+            <div class="stats-ga__kpi-value stats-ga__kpi-value--text"><%= @top_expense_month_label || "データなし" %></div>
+            <div class="stats-ga__kpi-subtext"><%= @top_expense_month_label ? "#{number_with_delimiter(@top_expense_month_total)}円" : "" %></div>
+          </div>
+        </div>
+      </div>
+
+      <% if @member_goods_ranking && @member_goods_ranking.values.sum > 0 %>
+        <div class="stats-ga__panel">
+          <div class="stats-ga__panel-header">
+            <div>
+              <h2 class="stats-ga__panel-title">グッズランキング</h2>
+            </div>
+          </div>
+          <ol class="stats-ga__ranking">
+            <% @member_goods_ranking.sort_by { |_, value| -value }.each_with_index do |(member_name, total), index| %>
+              <li>
+                <span><%= index + 1 %>. <%= member_name %></span>
+                <span class="stats-ga__ranking-value"><%= total %>円</span>
+              </li>
+            <% end %>
+          </ol>
+        </div>
+      <% end %>
+
+      <% if @category_expenses && @category_expenses.values.sum > 0 %>
+        <div class="stats-ga__panel">
+          <div class="stats-ga__panel-header">
+            <div>
+              <h2 class="stats-ga__panel-title">カテゴリ別：金額ランキング</h2>
+            </div>
+          </div>
+          <div class="stats-ga__split">
+            <div class="stats-ga__canvas stats-ga__canvas--square">
+              <canvas id="expenseChart"></canvas>
+            </div>
+            <ol class="stats-ga__ranking stats-ga__ranking--table">
+              <% total_expense = @category_expenses.values.sum %>
+              <% sorted = @category_expenses.sort_by { |_, total| -total } %>
+              <% top_items = sorted.first(2) %>
+              <% other_total = sorted.drop(2).sum { |(_, total)| total } %>
+              <% top_items.each_with_index do |(name, total), index| %>
+                <% percent = total_expense.positive? ? (total.to_f / total_expense * 100).round(1) : 0 %>
+                <li>
+                  <span class="stats-ga__ranking-name">
+                    <span class="stats-ga__ranking-title"><%= index + 1 %>. <%= name %></span>
+                    <span class="stats-ga__ranking-meta">
+                      <span class="stats-ga__ranking-percent"><%= percent %>%</span>
+                      <span class="stats-ga__ranking-amount"><%= number_with_delimiter(total) %>円</span>
+                    </span>
+                  </span>
+                </li>
+              <% end %>
+              <% if other_total.positive? %>
+                <% other_percent = total_expense.positive? ? (other_total.to_f / total_expense * 100).round(1) : 0 %>
+                <li>
+                  <span class="stats-ga__ranking-name">
+                    <span class="stats-ga__ranking-title">その他</span>
+                    <span class="stats-ga__ranking-meta">
+                      <span class="stats-ga__ranking-percent"><%= other_percent %>%</span>
+                      <span class="stats-ga__ranking-amount"><%= number_with_delimiter(other_total) %>円</span>
+                    </span>
+                  </span>
+                </li>
+              <% end %>
+            </ol>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @category_quantities && @category_quantities.values.sum > 0 %>
+        <div class="stats-ga__panel stats-ga__panel--tall">
+          <div class="stats-ga__panel-header">
+            <div>
+              <h2 class="stats-ga__panel-title">カテゴリ別：点数ランキング</h2>
+            </div>
+          </div>
+          <div class="stats-ga__canvas stats-ga__canvas--full">
+            <canvas id="categoryQuantityChart"></canvas>
+          </div>
+        </div>
+      <% end %>
+    </section>
+  </main>
+
+  <div id="chart-data"
+    data-genre-counts-keys="[]"
+    data-genre-counts-values="[]"
+    data-category-expenses-keys="<%= @category_expenses.keys.to_json %>"
+    data-category-expenses-values="<%= @category_expenses.values.to_json %>"
+    data-category-quantities-keys="<%= @category_quantities.keys.to_json %>"
+    data-category-quantities-values="<%= @category_quantities.values.to_json %>"
+    data-monthly-live-labels="[]"
+    data-monthly-live-counts="[]"
+    data-weekly-live-counts="[]"
+  >
+  </div>
+</div>

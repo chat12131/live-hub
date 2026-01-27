@@ -33,5 +33,8 @@ Rails.application.routes.draw do
     resources :categories, only: [:new, :create]
   end
   get 'statistics', to: 'statistics#index'
+  get 'statistics/live', to: 'statistics#live'
+  get 'statistics/goods', to: 'statistics#goods'
+  get 'statistics/artists', to: 'statistics#artists'
   root 'home#index'
 end

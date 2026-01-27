@@ -1,96 +1,94 @@
-<div class="main-container">
-  <div class="spec">
-    <h1 class="text-center">統計</h1>
-    <div class="row mb-4">
-      <div class="col-md-6 mb-2">
-        <h2 class="text-center">ライブ記録</h2>
-        <div class="card pt-3 pb-1">
-          <p class="text-center">ライブ記録の総数: <%= @total_live_records ? "#{@total_live_records}回" : "データがありません" %></p>
-          <p class="text-center">半年間のライブ数: <%= @half_year_live_count %>回</p>
-          <p class="text-center">今月のライブ数: <%= @this_month_live_count ? "#{@this_month_live_count}回" : "データがありません" %></p>
-          <p class="text-center">ライブに参加したアーティスト数: <%= @unique_artist_count ? "#{@unique_artist_count}組" : "データがありません" %></p>
+<div class="stats-ga">
+  <main class="stats-ga__main stats-ga__main--solo">
+    <header class="stats-ga__header">
+      <div>
+      <p class="stats-ga__eyebrow">Statistical Data</p>
+        <h1 class="stats-ga__title">統計ダッシュボード</h1>
+      </div>
+      <div class="stats-ga__header-actions"></div>
+    </header>
+
+    <section class="stats-ga__grid">
+      <div class="stats-ga__panel stats-ga__panel--wide">
+        <div class="stats-ga__panel-header">
+          <div>
+            <p class="stats-ga__panel-label">ライブ</p>
+            <h2 class="stats-ga__panel-title">今年のライブ動向</h2>
+          </div>
+          <%= link_to "詳細を見る", statistics_live_path, class: "stats-ga__panel-link" %>
+        </div>
+        <div class="stats-ga__kpis">
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">今年のライブ数</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@year_live_count) %><span>回</span></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">チケ+ドリンク</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@year_live_expense) %><span>円</span></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">最多会場</div>
+            <div class="stats-ga__kpi-value stats-ga__kpi-value--text">
+              <%= @year_top_venue_name ? @year_top_venue_name : "データなし" %>
+            </div>
+            <div class="stats-ga__kpi-subtext"><%= @year_top_venue_name ? "#{@year_top_venue_count}回" : "" %></div>
+          </div>
+        </div>
+        <div class="stats-ga__chart">
+          <div class="stats-ga__chart-placeholder" aria-hidden="true"></div>
         </div>
       </div>
-      <div class="col-md-6">
-        <h2 class="text-center">支出</h2>
-        <div class="card pt-3 pb-1">
-          <p class="text-center">ライブとグッズの総支出 : <%= @total_expense ? "#{@total_expense}円" : "データがありません" %></p>
-          <p class="text-center">ライブの総支出 : <%= @live_expense ? "#{@live_expense}円" : "データがありません" %></p>
-          <p class="text-center">グッズの総支出 : <%= @goods_expense ? "#{@goods_expense}円" : "データがありません" %></p>
-          <p class="text-center">今月のグッズ購入数: <%= @this_month_goods_count ? "#{@this_month_goods_count}回" : "データがありません" %></p>
+
+      <div class="stats-ga__panel">
+        <div class="stats-ga__panel-header">
+          <div>
+            <p class="stats-ga__panel-label">グッズ</p>
+            <h2 class="stats-ga__panel-title">今年の購入記録</h2>
+          </div>
+          <%= link_to "詳細を見る", statistics_goods_path, class: "stats-ga__panel-link" %>
+        </div>
+        <div class="stats-ga__kpis stats-ga__kpis--stack">
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">購入数</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@year_goods_count) %><span>点</span></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">購入金額</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@year_goods_expense) %><span>円</span></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">最多カテゴリ</div>
+            <div class="stats-ga__kpi-value stats-ga__kpi-value--text">
+              <%= @year_top_category_name ? @year_top_category_name : "データなし" %>
+            </div>
+            <div class="stats-ga__kpi-subtext"><%= @year_top_category_name ? "#{number_with_delimiter(@year_top_category_total)}点" : "" %></div>
+          </div>
         </div>
       </div>
-    </div>
-    <% if @member_goods_ranking && @member_goods_ranking.values.sum > 0%>
-      <h3 class="text-center">グッズランキング</h3>
-      <ol class="list-group mb-3">
-        <% @member_goods_ranking.sort_by { |_, value| -value }.each_with_index do |(member_name, total), index| %>
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <%= index + 1 %>. <%= member_name %>
-            <span class="badge badge-primary badge-pill"><%= total %>円</span>
-          </li>
-        <% end %>
-      </ol>
-    <% end %>
-    <% if @top_venues && @top_venues.values.sum > 0  %>
-      <div class="mb-3">
-        <h3 class="text-center">会場ランキング</h3>
-        <ol class="list-group">
-          <% @top_venues.each_with_index do |(venue_id, count), index| %>
-            <% venue = Venue.find_by(id: venue_id) %>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <%= index + 1 %>. <%= venue.name %>
-              <span class="badge badge-primary badge-pill">訪問回数: <%= count %></span>
-            </li>
-          <% end %>
-        </ol>
+
+      <div class="stats-ga__panel">
+        <div class="stats-ga__panel-header">
+          <div>
+            <p class="stats-ga__panel-label">アーティスト</p>
+            <h2 class="stats-ga__panel-title">アーティスト動向</h2>
+          </div>
+          <%= link_to "詳細を見る", statistics_artists_path, class: "stats-ga__panel-link" %>
+        </div>
+        <div class="stats-ga__kpis stats-ga__kpis--stack">
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">登録数</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@artists_total_count) %><span>組</span></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">今年追加</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@artists_year_count) %><span>組</span></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">お気に入り</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@artists_favorite_count) %><span>組</span></div>
+          </div>
+        </div>
       </div>
-    <% end %>
-    <div class="row">
-      <% if @monthly_live_counts %>
-        <div class="col-md-6 col-12 mb-4">
-          <h2>月別ライブ数</h2>
-          <div class="bar" style="width: 100%; height: 300px;">
-            <canvas id="monthlyLiveChart"></canvas>
-          </div>
-        </div>
-      <% end %>
-      <% if @weekly_live_counts %>
-        <div class="col-md-6 col-12 mb-4">
-          <h2>曜日別のライブ数</h2>
-          <div class="bar" style="width: 100%; height: 300px;">
-            <canvas id="weeklyChart"></canvas>
-          </div>
-        </div>
-      <% end %>
-    </div>
-    <div class="row justify-content-center">
-      <% if @genre_counts && @genre_counts.values.sum > 0%>
-        <div class="mb-4 text-center mx-auto">
-          <h2>ジャンル別の数</h2>
-          <div style="width: 350px; height: 350px;">
-            <canvas id="myChart"></canvas>
-          </div>
-        </div>
-      <% end %>
-      <% if @category_expenses && @category_expenses.values.sum > 0 %>
-        <div class="mb-4 text-center mx-auto">
-          <h2>グッズカテゴリー別の支出</h2>
-          <div style="width: 350px; height: 350px;">
-            <canvas id="expenseChart"></canvas>
-          </div>
-        </div>
-      <% end %>
-    </div>
-  </div>
-  <div id="chart-data"
-    data-genre-counts-keys="<%= @genre_counts.keys.to_json %>"
-    data-genre-counts-values="<%= @genre_counts.values.to_json %>"
-    data-category-expenses-keys="<%= @category_expenses.keys.to_json %>"
-    data-category-expenses-values="<%= @category_expenses.values.to_json %>"
-    data-monthly-live-labels="<%= @monthly_live_labels.to_json %>"
-    data-monthly-live-counts="<%= @monthly_live_counts.to_json %>"
-    data-weekly-live-counts="<%= @weekly_live_counts.values.to_json %>"
-  >
-  </div>
+    </section>
+  </main>
 </div>

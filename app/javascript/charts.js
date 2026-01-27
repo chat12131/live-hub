@@ -5,13 +5,28 @@ document.addEventListener('turbolinks:load', function() {
   }
 
   function getChartData(attribute) {
-    return JSON.parse(chartDataElement.getAttribute(attribute));
+    var value = chartDataElement.getAttribute(attribute);
+    if (!value) {
+      return [];
+    }
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      return [];
+    }
   }
 
   var genreLabels = getChartData('data-genre-counts-keys');
   var genreData = getChartData('data-genre-counts-values');
   var expenseLabels = getChartData('data-category-expenses-keys');
   var expenseData = getChartData('data-category-expenses-values');
+  var quantityLabels = getChartData('data-category-quantities-keys');
+  var quantityData = getChartData('data-category-quantities-values');
+  var artistAttendanceLabels = getChartData('data-artist-attendance-keys');
+  var artistAttendanceValues = getChartData('data-artist-attendance-values');
+  var artistAttendanceValuesNum = Array.isArray(artistAttendanceValues)
+    ? artistAttendanceValues.map(function(value) { return Number(value) || 0; })
+    : [];
   var monthlyLiveLabels = getChartData('data-monthly-live-labels');
   var monthlyLiveData = getChartData('data-monthly-live-counts');
   var weeklyData = getChartData('data-weekly-live-counts');
@@ -135,6 +150,89 @@ document.addEventListener('turbolinks:load', function() {
                     beginAtZero: true,
                     ticks: {
                         stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+  }
+
+  var quantityCanvas = document.getElementById('categoryQuantityChart');
+  if (quantityCanvas) {
+    var quantityCtx = quantityCanvas.getContext('2d');
+    new Chart(quantityCtx, {
+        type: 'bar',
+        data: {
+            labels: quantityLabels,
+            datasets: [{
+                label: '購入点数',
+                data: quantityData,
+                backgroundColor: 'rgba(26, 115, 232, 0.18)',
+                borderColor: 'rgba(26, 115, 232, 0.6)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+  }
+
+  var artistAttendanceCanvas = document.getElementById('artistAttendanceChart');
+  if (artistAttendanceCanvas) {
+    var barHeight = 32;
+    var barCount = Array.isArray(artistAttendanceLabels) ? artistAttendanceLabels.length : 0;
+    var targetHeight = Math.max(220, Math.min(520, barCount * barHeight));
+    var attendanceContainer = artistAttendanceCanvas.parentElement;
+    if (attendanceContainer) {
+      attendanceContainer.style.height = targetHeight + 'px';
+    }
+    var attendanceMax = Math.max(3, Math.max.apply(null, artistAttendanceValuesNum.length ? artistAttendanceValuesNum : [0]));
+    var artistAttendanceCtx = artistAttendanceCanvas.getContext('2d');
+    new Chart(artistAttendanceCtx, {
+        type: 'bar',
+        data: {
+            labels: artistAttendanceLabels,
+            datasets: [{
+                label: '参戦回数',
+                data: artistAttendanceValuesNum,
+                backgroundColor: 'rgba(26, 115, 232, 0.18)',
+                borderColor: 'rgba(26, 115, 232, 0.6)',
+                borderWidth: 1,
+                maxBarThickness: 22
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: attendanceMax,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
                     }
                 }
             }

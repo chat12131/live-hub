@@ -1,0 +1,149 @@
+<div class="stats-ga stats-ga--detail">
+  <main class="stats-ga__main">
+    <header class="stats-ga__header">
+      <div>
+        <p class="stats-ga__eyebrow">Statistical Data</p>
+        <h1 class="stats-ga__title">アーティスト統計</h1>
+        <p class="stats-ga__subtitle">登録アーティストの傾向をまとめて確認できます。</p>
+      </div>
+      <div class="stats-ga__header-actions">
+        <%= link_to "統計トップへ戻る", statistics_path, class: "stats-ga__back-link" %>
+      </div>
+    </header>
+
+    <section class="stats-ga__grid">
+      <div class="stats-ga__panel stats-ga__panel--wide">
+        <div class="stats-ga__panel-header">
+          <div>
+            <h2 class="stats-ga__panel-title">アーティストのサマリ</h2>
+          </div>
+        </div>
+        <div class="stats-ga__kpis stats-ga__kpis--three">
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">登録アーティスト数</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@artists_total_count) %><span>組</span></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">今年追加</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@artists_year_count) %><span>組</span></div>
+          </div>
+          <div class="stats-ga__kpi">
+            <div class="stats-ga__kpi-label">お気に入り</div>
+            <div class="stats-ga__kpi-value"><%= number_with_delimiter(@artists_favorite_count) %><span>組</span></div>
+          </div>
+        </div>
+      </div>
+
+      <% if @artist_attendance_labels.any? %>
+        <div class="stats-ga__panel stats-ga__panel--wide">
+          <div class="stats-ga__panel-header">
+            <div>
+              <h2 class="stats-ga__panel-title">参戦回数ランキング</h2>
+            </div>
+          </div>
+          <div class="stats-ga__canvas stats-ga__canvas--adaptive">
+            <canvas id="artistAttendanceChart"></canvas>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @artist_expense_ranking.present? %>
+        <div class="stats-ga__panel">
+          <div class="stats-ga__panel-header">
+            <div>
+              <h2 class="stats-ga__panel-title">支出ランキング</h2>
+            </div>
+          </div>
+          <ol class="stats-ga__ranking">
+            <% @artist_expense_ranking.each_with_index do |artist, index| %>
+              <li>
+                <span class="stats-ga__ranking-name">
+                  <span class="stats-ga__ranking-title"><%= index + 1 %>. <%= artist[:name] %></span>
+                  <span class="stats-ga__ranking-meta">
+                    <span class="stats-ga__ranking-percent">平均 <%= number_with_delimiter(artist[:avg]) %>円</span>
+                    <span class="stats-ga__ranking-amount"><%= number_with_delimiter(artist[:total]) %>円</span>
+                  </span>
+                </span>
+              </li>
+            <% end %>
+          </ol>
+        </div>
+      <% end %>
+
+      <% if @artist_recent_ranking.present? %>
+        <div class="stats-ga__panel">
+          <div class="stats-ga__panel-header">
+            <div>
+              <h2 class="stats-ga__panel-title">最近参戦したアーティスト</h2>
+            </div>
+          </div>
+          <ol class="stats-ga__ranking">
+            <% @artist_recent_ranking.each_with_index do |artist, index| %>
+              <li>
+                <span class="stats-ga__ranking-name">
+                  <span class="stats-ga__ranking-title"><%= index + 1 %>. <%= artist[:name] %></span>
+                  <span class="stats-ga__ranking-meta">
+                    <span class="stats-ga__ranking-percent">最終参戦</span>
+                    <span class="stats-ga__ranking-amount"><%= artist[:date] ? l(artist[:date]) : "-" %></span>
+                  </span>
+                </span>
+              </li>
+            <% end %>
+          </ol>
+        </div>
+      <% end %>
+
+      <% if @artist_away_ranking.present? %>
+        <div class="stats-ga__panel">
+          <div class="stats-ga__panel-header">
+            <div>
+              <h2 class="stats-ga__panel-title">久々アーティスト</h2>
+            </div>
+          </div>
+          <ol class="stats-ga__ranking">
+            <% @artist_away_ranking.each_with_index do |artist, index| %>
+              <li>
+                <span class="stats-ga__ranking-name">
+                  <span class="stats-ga__ranking-title"><%= index + 1 %>. <%= artist[:name] %></span>
+                  <span class="stats-ga__ranking-meta">
+                    <span class="stats-ga__ranking-percent">最終参戦</span>
+                    <span class="stats-ga__ranking-amount"><%= artist[:date] ? l(artist[:date]) : "-" %></span>
+                  </span>
+                </span>
+              </li>
+            <% end %>
+          </ol>
+        </div>
+      <% end %>
+
+      <% if @artist_trending.present? %>
+        <div class="stats-ga__panel">
+          <div class="stats-ga__panel-header">
+            <div>
+              <h2 class="stats-ga__panel-title">急上昇アーティスト</h2>
+            </div>
+          </div>
+          <ol class="stats-ga__ranking">
+            <% @artist_trending.each_with_index do |artist, index| %>
+              <li>
+                <span class="stats-ga__ranking-name">
+                  <span class="stats-ga__ranking-title"><%= index + 1 %>. <%= artist[:name] %></span>
+                  <span class="stats-ga__ranking-meta">
+                    <span class="stats-ga__ranking-percent">増加</span>
+                    <span class="stats-ga__ranking-amount"><%= artist[:delta] %>回</span>
+                  </span>
+                </span>
+              </li>
+            <% end %>
+          </ol>
+        </div>
+      <% end %>
+    </section>
+  </main>
+
+  <div id="chart-data"
+    data-artist-attendance-keys="<%= @artist_attendance_labels.to_json %>"
+    data-artist-attendance-values="<%= @artist_attendance_values.to_json %>"
+  >
+  </div>
+</div>
