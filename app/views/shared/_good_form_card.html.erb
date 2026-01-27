@@ -9,7 +9,7 @@
         <div class="live-form__section-title">必須</div>
         <div class="live-form__grid good-form__grid--primary">
           <div class="form-group live-form__field">
-            <%= f.label :quantity, "個数" %><span class="text-danger">*</span>
+            <%= f.label :quantity, raw('個数 <span class="text-danger">*</span>') %>
             <div class="cube-field cube-field--primary <%= 'is-invalid' if quantity_error %>">
               <div class="cube-field__shell">
                 <%= f.number_field :quantity, class: "form-control #{'is-invalid' if quantity_error}", placeholder: "数字を入力" %>
@@ -17,7 +17,7 @@
             </div>
           </div>
           <div class="form-group live-form__field">
-            <%= f.label :category_id, "カテゴリー" %> <span class="text-danger">*</span>
+            <%= f.label :category_id, raw('カテゴリー <span class="text-danger">*</span>') %>
             <div class="cube-field cube-field--primary <%= 'is-invalid' if category_error %>">
               <div class="cube-field__shell">
                 <%= f.select :category_id, categories.map { |c| [c.name, c.id] }, { include_blank: true, selected: @selected_category_id }, { class: "form-control #{'is-invalid' if category_error}", id: "category_selector" } %>
