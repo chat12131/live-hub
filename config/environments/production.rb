@@ -4,6 +4,8 @@
 
     config.hosts << "alb-livehub-prod-519348622.ap-northeast-1.elb.amazonaws.com"
     config.hosts << ".ap-northeast-1.elb.amazonaws.com"
+    config.hosts << "livehub.jp"
+      config.hosts << "www.livehub.jp"
 
     config.hosts << IPAddr.new("172.16.0.0/12")
     config.hosts << IPAddr.new("10.0.0.0/8")

@@ -8,6 +8,8 @@ Rails.application.configure do
 
 
   config.hosts << "alb-livehub-prod-519348622.ap-northeast-1.elb.amazonaws.com"
+  config.hosts << "livehub.jp"
+  config.hosts << "www.livehub.jp"
 
   config.consider_all_requests_local = true
 
