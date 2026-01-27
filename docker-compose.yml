@@ -16,6 +16,7 @@ services:
       - .env
     environment:
       RAILS_ENV: development
+      NODE_ENV: development
       MYSQL_HOST: db
       MYSQL_USERNAME: root
       MYSQL_PASSWORD: password
@@ -23,6 +24,7 @@ services:
       WEBPACKER_DEV_SERVER_PORT: 3035
     volumes:
       - .:/app:cached
+      - node_modules:/app/node_modules
       - bundle:/usr/local/bundle
     ports:
       - "3000:3000"
@@ -35,9 +37,12 @@ services:
     command: bash -lc "bin/webpack-dev-server"
     environment:
       RAILS_ENV: development              # ★これを追加
+      NODE_ENV: development
+      YARN_PRODUCTION: "false"
       WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
     volumes:
       - .:/app:cached
+      - node_modules:/app/node_modules
       - bundle:/usr/local/bundle
     ports:
       - "3035:3035"
@@ -45,3 +50,4 @@ services:
 volumes:
   mysql-data:
   bundle:
+  node_modules:
