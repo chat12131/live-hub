@@ -1,0 +1,53 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "livehub",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/livehub:latest",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "name": "livehub-3000-tcp",
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        { "name": "S3_BUCKET", "value": "livehub-prod-uploads" },
+        { "name": "RAILS_LOG_TO_STDOUT", "value": "true" },
+        { "name": "AWS_REGION", "value": "ap-northeast-1" },
+        { "name": "RACK_ENV", "value": "production" },
+        { "name": "RAILS_ENV", "value": "production" },
+        { "name": "RAILS_LOG_LEVEL", "value": "info" },
+        { "name": "RAILS_SERVE_STATIC_FILES", "value": "true" },
+        { "name": "weather_API", "value": "${WEATHER_API_KEY}" }
+      ],
+      "secrets": [
+        { "name": "DATABASE_URL", "valueFrom": "/livehub/prod/DATABASE_URL" },
+        { "name": "MYSQL_URL", "valueFrom": "/livehub/prod/DATABASE_URL" },
+        { "name": "SECRET_KEY_BASE", "valueFrom": "/livehub/prod/SECRET_KEY_BASE" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/livehub-web",
+          "awslogs-create-group": "true",
+          "awslogs-region": "ap-northeast-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "family": "livehub-web",
+  "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskRole-livehub-prod",
+  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole-livehub-prod",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [ "FARGATE" ],
+  "cpu": "256",
+  "memory": "512",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}

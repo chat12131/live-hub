@@ -1,0 +1,41 @@
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches: [ "main" ] # mainに保存されたらスタート
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 1. AWSログイン (OIDC)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-livehub
+          aws-region: ap-northeast-1
+
+      # 2. テンプレートの変数を本物の値に置き換える
+      - name: Render Amazon ECS task definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: livehub
+          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com/livehub:latest
+
+      # 3. ECSへデプロイ実行
+      - name: Deploy to Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+          service: livehub-web-prod
+          cluster: livehub
+          wait-for-service-stability: true
