@@ -154,7 +154,7 @@
                 <%= f.label :ticket_price, "チケット代" %>
                 <div class="cube-field <%= 'is-invalid' if ticket_price_error %>">
                   <div class="cube-field__shell">
-                    <%= f.number_field :ticket_price, class: "form-control #{'is-invalid' if ticket_price_error}", id: "ticket_price_input" %>
+                    <%= f.number_field :ticket_price, class: "form-control #{'is-invalid' if ticket_price_error}", id: "ticket_price_input", step: 500 %>
                   </div>
                 </div>
                 <% if ticket_price_error.present? %>
@@ -165,7 +165,7 @@
                 <%= f.label :drink_price, "ドリンク代" %>
                 <div class="cube-field <%= 'is-invalid' if drink_price_error %>">
                   <div class="cube-field__shell">
-                    <%= f.number_field :drink_price, class: "form-control #{'is-invalid' if drink_price_error}" %>
+                    <%= f.number_field :drink_price, class: "form-control #{'is-invalid' if drink_price_error}", step: 100 %>
                   </div>
                 </div>
                 <% if drink_price_error.present? %>
