@@ -21,7 +21,8 @@
         { "name": "RAILS_ENV", "value": "production" },
         { "name": "RAILS_LOG_LEVEL", "value": "info" },
         { "name": "RAILS_SERVE_STATIC_FILES", "value": "true" },
-        { "name": "weather_API", "value": "${WEATHER_API_KEY}" }
+        { "name": "weather_API", "value": "${WEATHER_API_KEY}" },
+        { "name": "GOOGLE_MAPS_API_KEY","value": "${GOOGLE_MAPS_API_KEY}"}
       ],
       "secrets": [
         { "name": "DATABASE_URL", "valueFrom": "/livehub/prod/DATABASE_URL" },
