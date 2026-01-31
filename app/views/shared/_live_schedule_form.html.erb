@@ -143,7 +143,7 @@
                 <%= f.label :ticket_sale_date, "チケット発売日時" %>
                 <div class="cube-field <%= 'is-invalid' if ticket_sale_date_error %>">
                   <div class="cube-field__shell">
-                    <%= f.text_field :ticket_sale_date, class: "flatpickr #{'is-invalid' if ticket_sale_date_error}", placeholder: "例：2024-10-01 18:00" %>
+                    <%= f.text_field :ticket_sale_date, class: "flatpickr #{'is-invalid' if ticket_sale_date_error}", placeholder: "例：2026-4-01 18:00" %>
                   </div>
                 </div>
                 <% if ticket_sale_date_error.present? %>
