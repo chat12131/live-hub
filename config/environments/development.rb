@@ -7,9 +7,7 @@ Rails.application.configure do
   config.eager_load = false
 
 
-  config.hosts << "alb-livehub-prod-519348622.ap-northeast-1.elb.amazonaws.com"
-  config.hosts << "livehub.jp"
-  config.hosts << "www.livehub.jp"
+  config.hosts.clear
 
   config.consider_all_requests_local = true
 
