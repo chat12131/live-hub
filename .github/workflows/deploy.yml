@@ -2,7 +2,7 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: [ "main" ] # mainに保存されたらスタート
+    branches: [ "main" ]
 
 permissions:
   id-token: write
@@ -22,16 +22,26 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-livehub
           aws-region: ap-northeast-1
 
-      # 2. テンプレートの変数を本物の値に置き換える
+      # 2. envsubst で JSON内の変数 (${AWS_ACCOUNT_ID}など) を本物の値に置き換える
+      # 💡 一時的なファイルを作成して、それをデプロイに使います
+      - name: Substitute Secrets in Task Definition
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+        run: |
+          envsubst < task-definition.json > task-definition-processed.json
+
+      # 3. 新しいイメージタグを反映したタスク定義を作成
       - name: Render Amazon ECS task definition
         id: render-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: task-definition.json
+          # 置換後のファイルを使う
+          task-definition: task-definition-processed.json
           container-name: livehub
           image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com/livehub:latest
 
-      # 3. ECSへデプロイ実行
+      # 4. ECSへデプロイ実行
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
